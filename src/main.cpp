@@ -4,21 +4,17 @@
 #include <iostream>
 #include <main.h>
 #include <shader.h>
+#include <math.h>
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
 int currentMode = GL_FILL;
-
-
-unsigned int VBO;
-unsigned int VBO2;
-unsigned int chosenVBO;
-unsigned int VAO;
-unsigned int VAO2;
-unsigned int chosenVAO;
+float moveX = 0.0f;
+float moveY = 0.0f;
 
 int main() {
   glfwInit();
+
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -30,6 +26,7 @@ int main() {
     glfwTerminate();
     return -1;
   }
+
   glfwMakeContextCurrent(window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -39,6 +36,7 @@ int main() {
   }
 
   glViewport(0, 0, WIDTH, HEIGHT);
+
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
   glfwSetKeyCallback(window, key_callback);
 
@@ -46,73 +44,61 @@ int main() {
     -1.0f,  0.0f, 0.0f,
     -0.5f, 0.5f, 0.0f,
     0.0f,  0.0f, 0.0f,
+    1.0f,  0.0f, 0.0f,
+    0.5f, 0.5f, 0.0f,
+    0.0f, -1.0f, 0.0f
   };
 
-  float vertices2[] = {
-    0.0f,  0.0f, 0.0f,
-    1.0f,  0.0f, 0.0f,
-    0.5f, 0.5f, 0.0f
+  unsigned int indices[] = {
+    0, 1, 2,
+    2, 3, 4,
+    0, 5, 3
   };
 
   Shader ourShader("shaders/shader.vs", "shaders/shader.fs");
   Shader ourYellowShader("shaders/shader.vs", "shaders/shader_yellow.fs");
 
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
+  GLuint vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
-  // unsigned int VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  GLuint vbo;
+  glGenBuffers(1, &vbo);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
   glEnableVertexAttribArray(0);
 
-  glGenBuffers(1, &VBO2);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  GLuint EBO;
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glEnableVertexAttribArray(1);
-
-
-  // glGenVertexArrays(1, &VAO2);
-  // glBindVertexArray(VAO2);
-
-  // unsigned int VBO2;
-
-
-  // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  // glEnableVertexAttribArray(0);
-  // unsigned int EBO;
-  // glGenBuffers(1, &EBO);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-  while (!glfwWindowShouldClose(window))
-  {
+  while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
+    // enable/disable wireframe mode
     glPolygonMode(GL_FRONT_AND_BACK, currentMode);
-    glBindVertexArray(VAO);
-    ourShader.use();
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    // glBindVertexArray(VAO2);
-    // ourYellowShader.use();
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(vao);
+    float timeValue = glfwGetTime();
+    float colors[] = { (sin(timeValue) / 2.0f) + 0.5f, 0.0f, 0.0f, 1.0f };
+    float translation[] = { moveX, moveY, 0, 0.0f };
+    ourShader.setVec4("ourColor", colors);
+    ourShader.setVec4("translation", translation);
+    ourShader.use();
+    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-  // glDeleteBuffers(1, &EBO);
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+  glDeleteBuffers(1, &EBO);
   ourShader.deleteShader();
   ourYellowShader.deleteShader();
 
@@ -133,23 +119,22 @@ void processInput(GLFWwindow* window)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-  if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-    if (currentMode == GL_LINE) {
-      currentMode = GL_FILL;
-    }
-    else {
-      currentMode = GL_LINE;
-    }
+  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+    currentMode = (currentMode == GL_LINE) ? GL_FILL : GL_LINE;
   }
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
-  if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-    chosenVAO = VAO;
+  if (key == GLFW_KEY_D) {
+    moveX += 0.1f;
   }
-  if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-    chosenVAO = VAO2;
+  if (key == GLFW_KEY_A) {
+    moveX -= 0.1f;
   }
-
-
+  if (key == GLFW_KEY_W) {
+    moveY += 0.1f;
+  }
+  if (key == GLFW_KEY_S) {
+    moveY -= 0.1f;
+  }
 }
