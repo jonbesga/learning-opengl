@@ -3,7 +3,7 @@
 COMPILER := g++
 
 SRC := src
-DEPS := -l glfw -I include -l dl -I $(SRC)
+DEPS := -l glfw -l dl -I include -I $(SRC)
 OBJECTS := $(shell find $(SRC)/ -type f -iname *.cpp -o -iname *.c)
 HEADERS := $(shell find $(SRC)/ -type f -iname *.h)
 
@@ -18,10 +18,12 @@ $(OUT_PROGRAM): $(OUT_FOLDER) $(OBJECTS) $(HEADERS)
 $(OUT_FOLDER):
 	mkdir -p $@
 
-run: $(OUT_PROGRAM)
+build: $(OUT_PROGRAM)
+
+run: build
 	./$(OUT_PROGRAM)
 
 clean:
 	rm -rf $(OUT_FOLDER)
 
-.PHONY: all clean run
+.PHONY: all clean run build

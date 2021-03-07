@@ -1,140 +1,103 @@
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <iostream>
-#include <main.h>
-#include <shader.h>
+#include <Shader.h>
 #include <math.h>
+// #include <image.h>
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
-int currentMode = GL_FILL;
-float moveX = 0.0f;
-float moveY = 0.0f;
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+  glViewport(0, 0, width, height);
+}
 
-int main() {
-  glfwInit();
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+  }
+}
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+int main(void) {
+  GLFWwindow* window;
 
-  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
-  if (window == NULL) {
-    std::cout << "Failed to create GLFW window" << std::endl;
+  if (!glfwInit()) {
+    return -1;
+  }
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+  if (!window) {
     glfwTerminate();
     return -1;
   }
 
   glfwMakeContextCurrent(window);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-  {
-    std::cout << "Failed to initialize GLAD" << std::endl;
+  if (!gladLoadGL()) {
     return -1;
   }
 
-  glViewport(0, 0, WIDTH, HEIGHT);
+  glViewport(0, 0, 640, 480);
 
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-  glfwSetKeyCallback(window, key_callback);
+  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+  glfwSetKeyCallback(window, keyCallback);
 
   float vertices[] = {
-    -1.0f,  0.0f, 0.0f,
-    -0.5f, 0.5f, 0.0f,
-    0.0f,  0.0f, 0.0f,
-    1.0f,  0.0f, 0.0f,
-    0.5f, 0.5f, 0.0f,
-    0.0f, -1.0f, 0.0f
+    -0.5f, -0.5f,
+    -0.5f, 0.5f,
+    0.5f, -0.5f,
+    0.5f, 0.5f,
   };
 
-  unsigned int indices[] = {
-    0, 1, 2,
-    2, 3, 4,
-    0, 5, 3
+  int indices[] = {
+    0, 2, 3,
+    0, 3, 1
   };
 
-  Shader ourShader("shaders/shader.vs", "shaders/shader.fs");
-  Shader ourYellowShader("shaders/shader.vs", "shaders/shader_yellow.fs");
+  // unsigned int vao;
+  // glGenVertexArrays(1, &vao);
+  // glBindVertexArray(vao);
 
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  unsigned int buffer;
+  glGenBuffers(1, &buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
 
-  GLuint EBO;
-  glGenBuffers(1, &EBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+  unsigned int ibo;
+  glGenBuffers(1, &ibo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  while (!glfwWindowShouldClose(window)) {
-    processInput(window);
 
+  ShaderProgram shaderProgram = ShaderProgram("res/shaders/basic.shader");
+  shaderProgram.use();
+  float red = 0;
+  float inc = 0.05f;
+
+  // loadImage("res/textures/wall.jpg");
+
+  while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // enable/disable wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, currentMode);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    red = sin(glfwGetTime());
 
-    glBindVertexArray(vao);
-    float timeValue = glfwGetTime();
-    float colors[] = { (sin(timeValue) / 2.0f) + 0.5f, 0.0f, 0.0f, 1.0f };
-    float translation[] = { moveX, moveY, 0, 0.0f };
-    ourShader.setVec4("ourColor", colors);
-    ourShader.setVec4("translation", translation);
-    ourShader.use();
-    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+    shaderProgram.setFloat("redColor", red);
 
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glfwSwapBuffers(window);
+
     glfwPollEvents();
   }
 
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vbo);
-  glDeleteBuffers(1, &EBO);
-  ourShader.deleteShader();
-  ourYellowShader.deleteShader();
-
+  shaderProgram.destroy();
 
   glfwTerminate();
   return 0;
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-  glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow* window)
-{
-
-}
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-  if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-    currentMode = (currentMode == GL_LINE) ? GL_FILL : GL_LINE;
-  }
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  }
-  if (key == GLFW_KEY_D) {
-    moveX += 0.1f;
-  }
-  if (key == GLFW_KEY_A) {
-    moveX -= 0.1f;
-  }
-  if (key == GLFW_KEY_W) {
-    moveY += 0.1f;
-  }
-  if (key == GLFW_KEY_S) {
-    moveY -= 0.1f;
-  }
 }
