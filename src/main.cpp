@@ -3,8 +3,11 @@
 #include <GLFW/glfw3.h>
 
 #include <Shader.h>
+#include <VertexBuffer.h>
+#include <IndexBuffer.h>
+#include <Texture.h>
+
 #include <math.h>
-// #include <image.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -23,10 +26,9 @@ int main(void) {
   if (!glfwInit()) {
     return -1;
   }
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
   if (!window) {
@@ -46,10 +48,10 @@ int main(void) {
   glfwSetKeyCallback(window, keyCallback);
 
   float vertices[] = {
-    -0.5f, -0.5f,
-    -0.5f, 0.5f,
-    0.5f, -0.5f,
-    0.5f, 0.5f,
+    -0.5f, -0.5f,   0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+    -0.5f, 0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+    0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+    0.5f, 0.5f,     0.0f, 0.0f, 1.0f,   1.0f, 1.0f
   };
 
   int indices[] = {
@@ -57,38 +59,45 @@ int main(void) {
     0, 3, 1
   };
 
-  // unsigned int vao;
-  // glGenVertexArrays(1, &vao);
-  // glBindVertexArray(vao);
+  unsigned int vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+  glBindVertexArray(vao);
 
-  unsigned int buffer;
-  glGenBuffers(1, &buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  VertexBuffer vb(vertices, sizeof(vertices));
+  vb.bind();
 
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
 
-  unsigned int ibo;
-  glGenBuffers(1, &ibo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(sizeof(float) * 2));
 
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(sizeof(float) * 5));
+
+  IndexBuffer ib(indices, sizeof(indices));
+  ib.bind();
 
   ShaderProgram shaderProgram = ShaderProgram("res/shaders/basic.shader");
   shaderProgram.use();
-  float red = 0;
-  float inc = 0.05f;
 
-  // loadImage("res/textures/wall.jpg");
+  glUniform1i(glGetUniformLocation(shaderProgram.id, "tex1"), 0);
+  glUniform1i(glGetUniformLocation(shaderProgram.id, "tex2"), 1);
+
+  Texture tex1 = Texture("res/textures/wall.jpg", true);
+  Texture tex2 = Texture("res/textures/awesomeface.png", true, true);
+
+  glActiveTexture(GL_TEXTURE0);
+  tex1.bind();
+  glActiveTexture(GL_TEXTURE1);
+  tex2.bind();
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    red = sin(glfwGetTime());
-
-    shaderProgram.setFloat("redColor", red);
+    float gradient = (sin(glfwGetTime()) / 2.0f) + 0.5f;
+    shaderProgram.setFloat("gradient", gradient);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glfwSwapBuffers(window);
