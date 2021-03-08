@@ -6,6 +6,7 @@
 #include <VertexBuffer.h>
 #include <IndexBuffer.h>
 #include <Texture.h>
+#include <Circle.h>
 
 #include <math.h>
 
@@ -99,7 +100,23 @@ int main(void) {
     float gradient = (sin(glfwGetTime()) / 2.0f) + 0.5f;
     shaderProgram.setFloat("gradient", gradient);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    // int n = 100;
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // float vertices[(3 * 2) + (2 * n)];
+    // int indices[n * 3];
+    // generateCircleVertices(n, vertices);
+    // generateCircleIndices(n, indices);
+
+    // VertexBuffer vb(vertices, sizeof(vertices));
+    // vb.bind();
+
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    // IndexBuffer ib(indices, sizeof(indices));
+    // ib.bind();
+
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, nullptr);
     glfwSwapBuffers(window);
 
     glfwPollEvents();
