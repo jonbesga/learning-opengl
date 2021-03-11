@@ -1,3 +1,5 @@
+#pragma once
+
 class IndexBuffer {
 public:
   unsigned int id;

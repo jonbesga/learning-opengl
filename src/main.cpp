@@ -1,14 +1,21 @@
-#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Shader.h>
-#include <VertexBuffer.h>
-#include <IndexBuffer.h>
-#include <Texture.h>
-#include <Circle.h>
-
-#include <math.h>
+#include <Camera.h>
+#include <Cube.h>
+#include <Plane.h>
+// #include <Shader.h>
+// #include <VertexBuffer.h>
+// #include <IndexBuffer.h>
+// #include <VertexArray.h>
+// #include <Texture.h>
+// #include <Circle.h>
+// #include <vector>
+// #include <math.h>
+// #include <glm/glm.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
+// #include <glm/gtc/type_ptr.hpp>
+// #include <glm/gtx/string_cast.hpp>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -18,6 +25,28 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+    int polygonMode[2];
+    glGetIntegerv(GL_POLYGON_MODE, &polygonMode[0]);
+    glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0] == GL_FILL ? GL_LINE : GL_FILL);
+  }
+}
+
+void processInput(GLFWwindow* window)
+{
+  Camera* camera = Camera::GetCamera();
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    camera->viewVector -= camera->cameraSpeed * glm::vec3(0.0f, 0.0f, -1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    camera->viewVector += camera->cameraSpeed * glm::vec3(1.0f, 0.0f, 0.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    camera->viewVector += camera->cameraSpeed * glm::vec3(0.0f, 0.0f, -1.0f);
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    camera->viewVector += camera->cameraSpeed * glm::vec3(-1.0f, 0.0f, 0.0f);
   }
 }
 
@@ -44,85 +73,79 @@ int main(void) {
   }
 
   glViewport(0, 0, 640, 480);
-
+  glEnable(GL_DEPTH_TEST);
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glfwSetKeyCallback(window, keyCallback);
 
-  float vertices[] = {
-    -0.5f, -0.5f,   0.0f, 0.0f, 0.0f,   0.0f, 0.0f,
-    -0.5f, 0.5f,    0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-    0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-    0.5f, 0.5f,     0.0f, 0.0f, 1.0f,   1.0f, 1.0f
-  };
+  MeshPlane meshPlane;
+  Cube cube2(glm::vec3(0.0f, 0.5f, 0.0f));
+  Object plane({ glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 1.0f, 20.0f) }, meshPlane);
 
-  int indices[] = {
-    0, 2, 3,
-    0, 3, 1
-  };
+  // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex1"), 0);
+    // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex2"), 1);
+    // glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    // glm::mat4 trans = glm::mat4(1.0f);
+    // trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    // vec = trans * vec;
+    // std::cout << vec.x << vec.y << vec.z << std::endl;
+  // float gradient = 1.0f;
+  // Texture tex1 = Texture("res/textures/lois.jpg", true);
+  // Texture tex2 = Texture("res/textures/awesomeface.png", true, true);
 
-  unsigned int vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-  glBindVertexArray(vao);
-
-  VertexBuffer vb(vertices, sizeof(vertices));
-  vb.bind();
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
-
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(sizeof(float) * 2));
-
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(sizeof(float) * 5));
-
-  IndexBuffer ib(indices, sizeof(indices));
-  ib.bind();
-
-  ShaderProgram shaderProgram = ShaderProgram("res/shaders/basic.shader");
-  shaderProgram.use();
-
-  glUniform1i(glGetUniformLocation(shaderProgram.id, "tex1"), 0);
-  glUniform1i(glGetUniformLocation(shaderProgram.id, "tex2"), 1);
-
-  Texture tex1 = Texture("res/textures/wall.jpg", true);
-  Texture tex2 = Texture("res/textures/awesomeface.png", true, true);
-
-  glActiveTexture(GL_TEXTURE0);
-  tex1.bind();
-  glActiveTexture(GL_TEXTURE1);
-  tex2.bind();
+  // glActiveTexture(GL_TEXTURE0);
+  // tex1.bind();
+  // glActiveTexture(GL_TEXTURE1);
+  // tex2.bind();
 
   while (!glfwWindowShouldClose(window)) {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float gradient = (sin(glfwGetTime()) / 2.0f) + 0.5f;
-    shaderProgram.setFloat("gradient", gradient);
 
-    // int n = 100;
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     // float vertices[(3 * 2) + (2 * n)];
     // int indices[n * 3];
     // generateCircleVertices(n, vertices);
     // generateCircleIndices(n, indices);
 
+    // VertexArray vao;
+    // vao.bind();
     // VertexBuffer vb(vertices, sizeof(vertices));
     // vb.bind();
+    // IndexBuffer ibo(indices, sizeof(indices));
+    // ibo.bind();
 
-    // glEnableVertexAttribArray(0);
-    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+    // std::vector<int> layouts;
+    // int count = 8;
 
-    // IndexBuffer ib(indices, sizeof(indices));
-    // ib.bind();
+    // layouts.push_back(3);
+    // layouts.push_back(3);
+    // layouts.push_back(2);
 
-    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, nullptr);
+    // int offset = 0;
+    // for (int i = 0; i < layouts.size(); i++) {
+    //   glEnableVertexAttribArray(i);
+    //   glVertexAttribPointer(i, layouts[i], GL_FLOAT, GL_FALSE, sizeof(float) * count, (void*)(sizeof(float) * offset));
+    //   offset += layouts[i];
+    // }
+    // if S
+    // z =- 1 * cameraSpeed
+    // glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 0.0f));
+
+    // glm::mat4 proj = glm::perspective(glm::radians(45.0f), 640.0f / 480.0f, 5.0f, 100.0f);
+
+    // glm::mat4 trans = proj * view * model;
+
+    // glUniformMatrix4fv(glGetUniformLocation(shaderProgram.id, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
+
+    cube2.draw();
+    plane.draw();
+
+    processInput(window);
     glfwSwapBuffers(window);
 
     glfwPollEvents();
   }
-
-  shaderProgram.destroy();
 
   glfwTerminate();
   return 0;

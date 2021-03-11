@@ -4,12 +4,16 @@ layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 in_color;
 layout (location = 2) in vec2 aTexCoord;
 
+uniform mat4 transform;
+
 out vec4 o_color;
 out vec2 TexCoord;
 
 void main()
 {
-  gl_Position = position;
+  gl_Position = transform * position;
+
+  
   o_color = in_color;
   TexCoord = aTexCoord;
 }
@@ -28,5 +32,5 @@ uniform float gradient;
 
 void main()
 {
-  FragColor = mix(texture(tex1, TexCoord), texture(tex2, TexCoord), gradient);
+  FragColor = o_color; // vec4(1.0f); // mix(texture(tex1, TexCoord), texture(tex2, TexCoord), gradient);
 }
