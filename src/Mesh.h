@@ -9,8 +9,6 @@ class Mesh {
 public:
   Mesh(float vertices[], int vertices_size, int indices[], int indices_size);
   void draw();
-protected:
-  void setup();
 private:
   float* vertices;
   int* indices;

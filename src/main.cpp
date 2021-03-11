@@ -77,9 +77,9 @@ int main(void) {
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
   glfwSetKeyCallback(window, keyCallback);
 
-  MeshPlane meshPlane;
+
   Cube cube2(glm::vec3(0.0f, 0.5f, 0.0f));
-  Object plane({ glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 1.0f, 20.0f) }, meshPlane);
+  Plane plane({ glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 1.0f, 20.0f) });
 
   // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex1"), 0);
     // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex2"), 1);

@@ -1,9 +1,8 @@
 #include <Object.h>
 #include <MeshPlane.h>
 
-// MeshPlane plane;
-
-// class Plane : public Object {
-// public:
-//   Plane(Transform transform) : Object(transform, plane) {};
-// };
+class Plane : public Object {
+public:
+  MeshPlane meshPlane;
+  Plane(Transform transform) : Object(transform, &meshPlane) {};
+};

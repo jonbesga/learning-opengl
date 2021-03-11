@@ -11,7 +11,7 @@ Mesh::Mesh(float vertices[], int vertices_size, int indices[], int indices_size)
   vbo(vertices, vertices_size),
   ibo(indices, indices_size) {
 
-  std::cout << "mesh:" << *vertices << "::" << vertices << std::endl;
+  std::cout << "Mesh created: " << *vertices << "::" << vertices << std::endl;
   std::vector<int> layouts;
   int count = 8;
 

@@ -13,17 +13,18 @@ struct Transform {
 class Object {
 private:
   Transform transform_;
-  MeshPlane mesh_;
+  MeshPlane* mesh_;
   ShaderProgram shader_;
 public:
-  Object(Transform transform, MeshPlane mesh) :
+  Object(Transform transform, MeshPlane* mesh) :
     Object(transform, mesh, "res/shaders/basic.shader") {};
 
-  Object(Transform transform, MeshPlane mesh, const std::string& shaderFilePath) :
+  Object(Transform transform, MeshPlane* mesh, const std::string& shaderFilePath) :
     transform_(transform),
     mesh_(mesh),
     shader_(ShaderProgram(shaderFilePath))
-  {};
+  {
+  };
 
   void draw();
 

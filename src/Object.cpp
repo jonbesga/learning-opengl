@@ -19,6 +19,6 @@ void Object::draw() {
   glm::mat4 trans = proj * view * model;
 
   glUniformMatrix4fv(glGetUniformLocation(this->shader_.id, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
-
-  this->mesh_.draw();
+  std::cout << "mesh trans: " << &this->mesh_ << std::endl;
+  this->mesh_->draw();
 }
