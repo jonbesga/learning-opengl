@@ -1,8 +1,8 @@
+#pragma once
 #include <glm/glm.hpp>
 
 #include <Mesh.h>
 #include <Shader.h>
-#include <MeshPlane.h>
 
 struct Transform {
   glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -13,13 +13,13 @@ struct Transform {
 class Object {
 private:
   Transform transform_;
-  MeshPlane* mesh_;
+  Mesh* mesh_;
   ShaderProgram shader_;
 public:
-  Object(Transform transform, MeshPlane* mesh) :
+  Object(Transform transform, Mesh* mesh) :
     Object(transform, mesh, "res/shaders/basic.shader") {};
 
-  Object(Transform transform, MeshPlane* mesh, const std::string& shaderFilePath) :
+  Object(Transform transform, Mesh* mesh, const std::string& shaderFilePath) :
     transform_(transform),
     mesh_(mesh),
     shader_(ShaderProgram(shaderFilePath))

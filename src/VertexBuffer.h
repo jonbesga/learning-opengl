@@ -3,7 +3,8 @@
 class VertexBuffer {
 public:
   unsigned int id;
-  VertexBuffer(const float arr[], int size);
+  VertexBuffer();
+  void bufferData(const float arr[], int size);
   void bind();
   void unBind();
 };

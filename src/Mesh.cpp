@@ -4,13 +4,13 @@
 
 #include <vector>
 
-Mesh::Mesh(float vertices[], int vertices_size, int indices[], int indices_size) :
-  vertices(vertices),
-  indices(indices),
-  indices_size(indices_size),
-  vbo(vertices, vertices_size),
-  ibo(indices, indices_size) {
+void Mesh::setup(float* vertices, int vertices_size, int* indices, int indices_size) {
 
+  this->indices_size = indices_size;
+  this->vertices_size = vertices_size;
+
+  this->vbo.bufferData(vertices, vertices_size);
+  this->ibo.bufferData(indices, indices_size);
   std::cout << "Mesh created: " << *vertices << "::" << vertices << std::endl;
   std::vector<int> layouts;
   int count = 8;

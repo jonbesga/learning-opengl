@@ -1,8 +1,11 @@
 #include <glad/glad.h>
 #include <IndexBuffer.h>
 
-IndexBuffer::IndexBuffer(int arr[], int size) {
+IndexBuffer::IndexBuffer() {
   glGenBuffers(1, &id);
+}
+
+void IndexBuffer::bufferData(int arr[], int size) {
   this->bind();
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, arr, GL_STATIC_DRAW);
 }

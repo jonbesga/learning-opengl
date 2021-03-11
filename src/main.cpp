@@ -4,18 +4,7 @@
 #include <Camera.h>
 #include <Cube.h>
 #include <Plane.h>
-// #include <Shader.h>
-// #include <VertexBuffer.h>
-// #include <IndexBuffer.h>
-// #include <VertexArray.h>
-// #include <Texture.h>
-// #include <Circle.h>
-// #include <vector>
-// #include <math.h>
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
-// #include <glm/gtc/type_ptr.hpp>
-// #include <glm/gtx/string_cast.hpp>
+
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -78,8 +67,17 @@ int main(void) {
   glfwSetKeyCallback(window, keyCallback);
 
 
-  Cube cube2(glm::vec3(0.0f, 0.5f, 0.0f));
-  Plane plane({ glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 1.0f, 20.0f) });
+  Cube cube2({
+    glm::vec3(0.0f, 0.5f, 0.0f),
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(1.0f, 1.0f, 1.0f)
+    });
+
+  Plane plane({
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(20.0f, 1.0f, 20.0f)
+    });
 
   // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex1"), 0);
     // glUniform1i(glGetUniformLocation(shaderProgram.id, "tex2"), 1);
@@ -99,7 +97,6 @@ int main(void) {
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 
     // float vertices[(3 * 2) + (2 * n)];

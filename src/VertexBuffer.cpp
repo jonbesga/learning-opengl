@@ -1,8 +1,11 @@
 #include <glad/glad.h>
 #include <VertexBuffer.h>
 
-VertexBuffer::VertexBuffer(const float arr[], int size) {
+VertexBuffer::VertexBuffer() {
   glGenBuffers(1, &this->id);
+}
+
+void VertexBuffer::bufferData(const float arr[], int size) {
   this->bind();
   glBufferData(GL_ARRAY_BUFFER, size, arr, GL_STATIC_DRAW);
 }

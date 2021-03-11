@@ -6,17 +6,17 @@
 
 
 class Mesh {
-public:
-  Mesh(float vertices[], int vertices_size, int indices[], int indices_size);
-  void draw();
 private:
-  float* vertices;
-  int* indices;
   int indices_size;
   int vertices_size;
 
   VertexArray vao;
   VertexBuffer vbo;
   IndexBuffer ibo;
+public:
+  Mesh() {};
+  void setup(float* vertices, int vertices_size, int* indices, int indices_size);
+  void draw();
+
 };
 
