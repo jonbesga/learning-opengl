@@ -1,3 +1,5 @@
+#pragma once
+
 class Texture {
 public:
   unsigned int id;

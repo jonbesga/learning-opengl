@@ -4,5 +4,11 @@
 class Cube : public Object {
 public:
   MeshCube mesh;
-  Cube(Transform transform) : Object(transform, &mesh) {};
+  Cube() : Object() {
+    this->setMesh(&mesh);
+  }
+  Cube(Transform transform) : Object(transform) {
+    this->setMesh(&mesh);
+
+  };
 };

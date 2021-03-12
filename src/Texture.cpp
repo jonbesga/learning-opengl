@@ -6,7 +6,7 @@
 Texture::Texture(char const* filepath, bool flip, bool hasAlpha) {
   ImageData imageData = loadImage(filepath, flip);
   glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
+  this->bind();
   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -23,6 +23,7 @@ Texture::Texture(char const* filepath, bool flip, bool hasAlpha) {
   }
 
   stbi_image_free(imageData.data);
+  this->unBind();
 }
 
 void Texture::bind() {

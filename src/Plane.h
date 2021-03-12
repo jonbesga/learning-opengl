@@ -3,6 +3,11 @@
 
 class Plane : public Object {
 public:
-  MeshPlane meshPlane;
-  Plane(Transform transform) : Object(transform, &meshPlane) {};
+  MeshPlane mesh;
+  Plane() : Object() {
+    this->setMesh(&mesh);
+  };
+  Plane(Transform transform) : Object(transform) {
+    this->setMesh(&mesh);
+  };
 };

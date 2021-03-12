@@ -4,7 +4,13 @@
 
 #include <vector>
 
-void Mesh::setup(float* vertices, int vertices_size, int* indices, int indices_size) {
+struct Layout {
+  int size;
+  int stride;
+  int offset;
+};
+
+void Mesh::setup(float* vertices, int vertices_size, int* indices, int indices_size, int offsetTexture) {
 
   this->indices_size = indices_size;
   this->vertices_size = vertices_size;
@@ -12,18 +18,18 @@ void Mesh::setup(float* vertices, int vertices_size, int* indices, int indices_s
   this->vbo.bufferData(vertices, vertices_size);
   this->ibo.bufferData(indices, indices_size);
   std::cout << "Mesh created: " << *vertices << "::" << vertices << std::endl;
-  std::vector<int> layouts;
-  int count = 8;
 
-  layouts.push_back(3);
-  layouts.push_back(3);
-  layouts.push_back(2);
+  std::vector<Layout> layouts;
 
-  int offset = 0;
+  layouts.push_back({ 3, 3, 0 });
+  layouts.push_back({ 2, 2, offsetTexture });
+
+
   for (int i = 0; i < layouts.size(); i++) {
+    int offset = layouts[i].offset;
     glEnableVertexAttribArray(i);
-    glVertexAttribPointer(i, layouts[i], GL_FLOAT, GL_FALSE, sizeof(float) * count, (void*)(sizeof(float) * offset));
-    offset += layouts[i];
+
+    glVertexAttribPointer(i, layouts[i].size, GL_FLOAT, GL_FALSE, sizeof(float) * layouts[i].stride, (void*)(sizeof(float) * offset));
   }
 
   this->ibo.unBind();

@@ -11,5 +11,26 @@ Camera* Camera::GetCamera() {
 };
 
 glm::mat4 Camera::getViewMat() {
-  return glm::translate(glm::mat4(1.0f), this->viewVector);
+  return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+  // return glm::translate(glm::mat4(1.0f), this->viewVector);
+}
+
+void Camera::forward()
+{
+  cameraPos += cameraSpeed * cameraFront;
+}
+
+void Camera::left()
+{
+  cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void Camera::right()
+{
+  cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void Camera::back()
+{
+  cameraPos -= cameraSpeed * cameraFront;
 }

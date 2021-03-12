@@ -32,5 +32,6 @@ uniform float gradient;
 
 void main()
 {
-  FragColor = o_color; // vec4(1.0f); // mix(texture(tex1, TexCoord), texture(tex2, TexCoord), gradient);
+  // FragColor = vec4(1.0f);
+  FragColor = o_color; // mix(texture(tex1, TexCoord), texture(tex2, TexCoord), gradient);
 }

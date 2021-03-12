@@ -15,7 +15,7 @@ private:
   IndexBuffer ibo;
 public:
   Mesh() {};
-  void setup(float* vertices, int vertices_size, int* indices, int indices_size);
+  void setup(float* vertices, int vertices_size, int* indices, int indices_size, int offsetTexture);
   void draw();
 
 };
